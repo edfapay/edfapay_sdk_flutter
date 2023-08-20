@@ -31,11 +31,6 @@ class MockFlutterEdfapayPluginPlatform
     throw UnimplementedError();
   }
 
-  @override
-  Future<bool> serverCompletion(bool status) {
-    throw UnimplementedError();
-  }
-
 }
 
 void main() {

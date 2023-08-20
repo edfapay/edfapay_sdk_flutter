@@ -44,8 +44,8 @@ android {
         minSdkVersion 28
     }
     dependencies {
-        implementation 'com.edfapay:edfapay-plugin-android:dev-SNAPSHOT'
-//        implementation 'com.google.code.gson:gson:2.9.0'
+        implementation 'com.edfapay:edfapay-plugin-android:main-SNAPSHOT'
+        implementation 'com.google.code.gson:gson:2.9.0'
     }
 }
 

@@ -8,6 +8,7 @@ import 'package:flutter_edfapay_plugin/flutter_edfapay_plugin.dart';
 import 'package:flutter_edfapay_plugin/models/TxnParams.dart';
 import 'package:flutter_edfapay_plugin_example/helper_methods.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hexcolor/hexcolor.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,6 +28,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    initiate();
   }
 
   @override
@@ -35,30 +37,63 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       // builder: FToastBuilder(),
       home: Scaffold(
-        body: Center(
+        body: Padding(
+          padding: const EdgeInsets.all(15),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if(_edfaPluginInitiated)
-                SizedBox(
-                  width: 200,
-                  child: ElevatedButton(
-                      onPressed: pay,
-                      style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll( Colors.green)),
-                      child: const Text("Pay 10 SAR")
+              const SizedBox(height: 20),
+              Expanded(
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    FractionallySizedBox(
+                      widthFactor: 0.3,
+                        child: Image.asset("assets/images/edfa_logo.png")
+                    ),
+                    SizedBox(height: 30),
+                    const Text(
+                        "SDK",
+                        style: TextStyle(fontSize: 65, fontWeight: FontWeight.w700), textAlign: TextAlign.center
+                    ),
+                    SizedBox(height: 10),
+                    const Text(
+                        "v0.0.1",
+                        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold), textAlign: TextAlign.center
+                    ),
+                  ],
+                ),
+              ),
+
+              const Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                      "You\'re on your way to enabling your Android App to allow your customers to pay in a very easy and simple way just click the payment button and tap your payment card on NFC enabled Android phone.",
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.black45),
+                      textAlign: TextAlign.center
                   ),
-                )
-              else
-                SizedBox(
-                  width: 200,
-                  child: ElevatedButton(
-                      onPressed: initiate,
-                      style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.blueAccent)),
-                      child: const Text("Initiate Edfapay")
-                  ),
-                )
+                ),
+              ),
+
+              ElevatedButton(
+                  onPressed: pay,
+                  style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(HexColor("06E59F"))),
+                  child: const Text("Pay 10 SAR", style: TextStyle(color: Colors.black))
+              ),
+
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                    "Click on button above to test the card processing with 10.00 SAR",
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400), textAlign: TextAlign.center
+                ),
+              ),
             ],
-          )
+          ),
         ),
       ),
     );
@@ -77,6 +112,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   pay() async{
+    if(!_edfaPluginInitiated){
+      toast("Edfapay plugin not initialized.");
+      return;
+    }
+
     final params = TxnParams(
         txnSeqCounter: "11",
         amount: "10.00",
