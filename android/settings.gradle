@@ -1,0 +1,13 @@
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url "https://jitpack.io"
+            credentials { username "jp_i9ed2av1lj1kjnqpgobpeh0e7k" }
+        }
+    }
+}
+
+rootProject.name = 'flutter_edfapay_plugin'
