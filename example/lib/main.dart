@@ -21,93 +21,88 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
   final _flutterEdfapayPlugin = FlutterEdfapayPlugin();
+  var _edfaPluginInitiated = false;
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-          await _flutterEdfapayPlugin.getPlatformVersion() ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
-  }
-
-
-  initAndPay(){
-
-    _flutterEdfapayPlugin
-        .initiate(
-        "merchantNameAddress",
-        "interfaceDeviceSerialNumber",
-        [PaymentScheme.MADA_VISA]
-    ).then((value){
-      if(value){
-        final params = TxnParams(
-            txnSeqCounter: "11",
-            amount: "10.00",
-            floorLimit: "200.00",
-            transactionType: TransactionType.purchase,
-            countryCode: "SA",
-            currencyCode: "SAR"
-        );
-
-
-        toast("Ready to scan card");
-        _flutterEdfapayPlugin.pay(
-            params,
-            onCardProcessingComplete: (kernelResponse, serverCompletion){
-              toast("Card Processing Completed");
-              serverCompletion(true, (){
-                toast("Server Status Acknowledged");
-              });
-            },
-            onCardScanTimerEnd: (){
-              toast("Card Scan Timeout");
-            },
-            onRequestTimerEnd: (){
-              toast("Server Request Timeout");
-            }
-        );
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
 
     return MaterialApp(
-      builder: FToastBuilder(),
+      // builder: FToastBuilder(),
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
         body: Center(
-          child: ElevatedButton(
-              onPressed: initAndPay,
-              child: Text("Pay 10 SAR")
-          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if(_edfaPluginInitiated)
+                SizedBox(
+                  width: 200,
+                  child: ElevatedButton(
+                      onPressed: pay,
+                      style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll( Colors.green)),
+                      child: const Text("Pay 10 SAR")
+                  ),
+                )
+              else
+                SizedBox(
+                  width: 200,
+                  child: ElevatedButton(
+                      onPressed: initiate,
+                      style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(Colors.blueAccent)),
+                      child: const Text("Initiate Edfapay")
+                  ),
+                )
+            ],
+          )
         ),
       ),
+    );
+  }
+
+
+
+  initiate() async{
+    _edfaPluginInitiated = await _flutterEdfapayPlugin.initiate(
+        "Edfapay, Riyadh Saudi Arabia",
+        "0000000000000001",
+        [PaymentScheme.MADA_VISA]
+    );
+
+    setState(() {});
+  }
+
+  pay() async{
+    final params = TxnParams(
+        txnSeqCounter: "11",
+        amount: "10.00",
+        floorLimit: "200.00",
+        transactionType: TransactionType.purchase,
+        countryCode: "SA",
+        currencyCode: "SAR"
+    );
+
+    toast("Ready to scan card");
+    _flutterEdfapayPlugin.pay(
+        params,
+        onCardProcessingComplete: (kernelResponse, serverCompletion){
+          toast("Card Processing Completed");
+          delay(10, () {
+            serverCompletion(true, (){
+              toast("Server Status Acknowledged");
+            });
+          });
+        },
+        onCardScanTimerEnd: (){
+          toast("Card Scan Timeout");
+        },
+        onRequestTimerEnd: (){
+          toast("Server Request Timeout");
+        }
     );
   }
 }

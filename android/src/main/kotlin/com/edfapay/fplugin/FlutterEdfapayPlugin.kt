@@ -7,6 +7,7 @@ import androidx.annotation.NonNull
 import com.edfapay.fplugin.helpers.toTxnParams
 import com.edfapay.paymentcard.EdfaPayPlugin
 import com.edfapay.paymentcard.card.PaymentScheme
+import com.edfapay.paymentcard.model.TransactionType
 import com.edfapay.paymentcard.model.TxnParams
 import com.edfapay.paymentcard.utils.delay
 import com.google.gson.Gson
@@ -89,6 +90,7 @@ class FlutterEdfapayPlugin: FlutterPlugin, MethodCallHandler, EventChannel.Strea
     activity?.let { activity ->
       (arguments as String?)?.let {
         val txnParams = Gson().toTxnParams(it)
+
         EdfaPayPlugin.pay(
           activity = activity,
           txnParams,
